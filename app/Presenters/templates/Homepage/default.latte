@@ -1,4 +1,7 @@
 {block content}
+	
+	<a n:href="Post:create" n:if="$user->isLoggedIn()">Napsat nový příspěvek</a>
+
 	<h1 n:block="title">Můj blog</h1>
 
 	{* {foreach $posts as $post}
