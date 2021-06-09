@@ -3,27 +3,28 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<link rel="stylesheet" href="{$basePath}/css/style.css">
+
 	<title>{ifset title}{include title|stripHtml} | {/ifset}Nette Web</title>
+
+	<link href="{$basePath}/css/style.css" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com"> 
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;500&display=swap" rel="stylesheet">
 </head>
 
 <body>
-	<ul class="navig">
-		<li><a n:href="Homepage:">Články</a></li>
-		{if $user->isLoggedIn()}
-			<li><a n:href="Sign:out">Odhlásit</a></li>
-		{else}
-			<li><a n:href="Sign:in">Přihlásit</a></li>
-		{/if}
-	</ul>
-
-	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
-
+	<div class="navbar">
+		<ul class="navig">
+			<li><a class="animation" n:href="Homepage:">DOMŮ</a></li>
+			{if $user->isLoggedIn()}
+				<li class="right"><a class="animation" n:href="Sign:out">ODHLÁSIT</a></li>
+			{else}
+				<li class="right"><a class="animation"n:href="Sign:in">PŘIHLÁSIT</a></li>
+			{/if}
+		</ul>
+	</div>
 	{include content}
 	
-	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">
-		{$flash->message}
-	</div>
+	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
 
 	{block scripts}
