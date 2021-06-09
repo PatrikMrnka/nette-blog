@@ -1,8 +1,8 @@
 {block content}
 
-<a n:href="edit $post->id" n:if="$user->isLoggedIn()">Upravit příspěvek</a>
+<a class="animation center" n:href="edit $post->id" n:if="$user->isLoggedIn()">Upravit příspěvek</a>
 
-<p><a n:href="Homepage:default">← zpět na výpis příspěvků</a></p>
+<p><a class="animation center" n:href="Homepage:default">← zpět na výpis příspěvků</a></p>
 
 <div class="date">{$post->created_at|date:'F j, Y'}</div>
 
