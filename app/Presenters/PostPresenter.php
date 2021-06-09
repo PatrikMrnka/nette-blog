@@ -64,9 +64,10 @@ final class PostPresenter extends Nette\Application\UI\Presenter
 	protected function createComponentPostForm(): Form
 	{
 		$form = new Form;
-		$form->addText('title', 'Titulek')
+		
+		$form->addText('title', 'Titulek: ')
 			->setRequired();
-		$form->addTextArea('content', 'Obsah:')
+		$form->addTextArea('content', 'Obsah: ')
 			->setRequired();
 
 		$form->addSubmit('send', 'Uložit a publikovat');
@@ -77,11 +78,11 @@ final class PostPresenter extends Nette\Application\UI\Presenter
 
 	public function postFormSucceeded(Form $form, array $values): void
 	{
-		$postId = $this->getParameter('postId');
-
 		if ($this->getUser()->isLoggedIn()) {
 			$this->error('Pro vytvoření, nebo editování příspěvku se musíte přihlásit.');
 		}
+
+		$postId = $this->getParameter('postId');
 
 		if ($postId) {
 			$post = $this->database->table('posts')->get($postId);
@@ -99,7 +100,6 @@ final class PostPresenter extends Nette\Application\UI\Presenter
 		if (!$this->getUser()->isLoggedIn()) {
 			$this->redirect('Sign:in');
 		}
-		
 		
 		$post = $this->database->table('posts')->get($postId);
 		if (!$post) {
