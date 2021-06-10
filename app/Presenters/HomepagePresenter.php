@@ -6,7 +6,7 @@ namespace App\Presenters;
 
 use Nette;
 
-class HomepagePresenter extends Nette\Application\UI\Presenter
+final class HomepagePresenter extends Nette\Application\UI\Presenter
 {
 	private Nette\Database\Explorer $database;
 
