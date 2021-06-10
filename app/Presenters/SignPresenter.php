@@ -5,7 +5,7 @@ namespace App\Presenters;
 use Nette;
 use Nette\Application\UI\Form;
 
-final class SignPresenter extends Nette\Application\UI\Presenter
+class SignPresenter extends Nette\Application\UI\Presenter
 {
     protected function createComponentSignInForm(): Form
     {
@@ -26,8 +26,9 @@ final class SignPresenter extends Nette\Application\UI\Presenter
     {
         try {
             $this->getUser()->login($values->username, $values->password);
+            $this->flashMessage('Přihlášení bylo úspěšné.');
             $this->redirect('Homepage:');
-        } catch (Nette\Security\Authentication $e) {
+        } catch (Nette\Security\AuthenticationExcepetion $e) {
             $form->addError('Nesprávné přihlašovací jméno nebo heslo.');
         }
     }
@@ -38,4 +39,5 @@ final class SignPresenter extends Nette\Application\UI\Presenter
         $this->flashMessage('Odhlášení bylo úspěšné.');
         $this->redirect('Homepage:');
     }
+    
 }
