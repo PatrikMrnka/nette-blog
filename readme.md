@@ -1,5 +1,5 @@
 Nette Web Project
 =================
 
-Přihlašovací jméno: admin
+Přihlašovací jméno: admin\
 Heslo: secret
