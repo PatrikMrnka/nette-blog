@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Presenters;
 
 use Nette;
 use Nette\Application\UI\Form;
 
-final class PostPresenter extends Nette\Application\UI\Presenter
+class PostPresenter extends Nette\Application\UI\Presenter
 {
     private Nette\Database\Explorer $database;
     
@@ -71,18 +69,18 @@ final class PostPresenter extends Nette\Application\UI\Presenter
 			->setRequired();
 
 		$form->addSubmit('send', 'Uložit a publikovat');
-		$form->onSuccess[] = [$this, 'postformSucceeded'];
+		$form->onSuccess[] = [$this, 'postFormSucceeded'];
 
 		return $form;
 	}
 
 	public function postFormSucceeded(Form $form, array $values): void
 	{
-		if ($this->getUser()->isLoggedIn()) {
+		$postId = $this->getParameter('postId');
+
+		if (!$this->getUser()->isLoggedIn()) {
 			$this->error('Pro vytvoření, nebo editování příspěvku se musíte přihlásit.');
 		}
-
-		$postId = $this->getParameter('postId');
 
 		if ($postId) {
 			$post = $this->database->table('posts')->get($postId);
@@ -95,23 +93,24 @@ final class PostPresenter extends Nette\Application\UI\Presenter
 		$this->redirect('show', $post->id);
 	}
 
-	public function actionEdit(int $postId): void
+	public function actionCreate(): void
 	{
 		if (!$this->getUser()->isLoggedIn()) {
 			$this->redirect('Sign:in');
 		}
+	}
+
+
+	public function actionEdit(int $postId): void
+	{
+		if (!$this->getUser()->isLoggedIn()) {
+			$this->redirect('Sign:in');
+		}	
 		
 		$post = $this->database->table('posts')->get($postId);
 		if (!$post) {
 			$this->error('Příspěvek nebyl nalezen');
 		}
 		$this['postForm']->setDefaults($post->toArray());
-	}
-
-	public function actionCreate(): void
-	{
-		if (!$this->getUser()->isLoggedIn()) {
-			$this->redirect('Sign:in');
-		}
 	}
 }
