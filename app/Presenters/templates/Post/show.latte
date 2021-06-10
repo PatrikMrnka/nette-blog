@@ -1,18 +1,21 @@
 {block content}
 
-<a class="animation center" n:href="edit $post->id" n:if="$user->isLoggedIn()">Upravit příspěvek</a>
-
-<p><a class="animation center" n:href="Homepage:default">← zpět na výpis příspěvků</a></p>
-
+<div class="center">
+	<p><a class="animation" n:href="Homepage:default">← zpět na výpis příspěvků</a></p>
+	<a class="animation" n:href="edit $post->id" n:if="$user->isLoggedIn()">Upravit příspěvek</a>
+</div>
 <div class="date">{$post->created_at|date:'F j, Y'}</div>
 
 <h1 n:block="title">{$post->title}</h1>
 
-<div class="post">{$post->content}</div>
+<div class="post art">{$post->content}</div>
 
-<h2>Komentáře</h2>
+<h2>Komentáře ({count($comments)})</h2>
 
 <div class="comments">
+	{if count($comments) == 0}
+		<p>Nejsou tu žádné komentáře.</p>
+	{/if}
 	{foreach $comments as $comment}
 		<p><b><a href="mailto:{$comment->email}" n:tag-if="$comment->email">
 			{$comment->name}
@@ -21,6 +24,12 @@
 		<div>{$comment->content}</div>
 	{/foreach}
 </div>
+
+			{* {if $user->isLoggedIn()}
+				<li class="right"><a class="animation" n:href="Sign:out">ODHLÁSIT</a></li>
+			{else}
+				<li class="right"><a class="animation"n:href="Sign:in">PŘIHLÁSIT</a></li>
+			{/if} *}
 
 
 <h2>Vložte nový příspěvek</h2>
