@@ -1,6 +1,6 @@
 {block content}
-	<div>
-		<a class="animation center" n:href="Post:create" n:if="$user->isLoggedIn()">Napsat nový příspěvek</a>
+	<div class="center">
+		<a class="animation" n:href="Post:create" n:if="$user->isLoggedIn()">Vytvořit příspěvek</a>
 	</div>
 	<h1 n:block="title">Můj blog</h1>
 
@@ -20,7 +20,7 @@
 		{* <h2><a href="{link Post:show $post->id}">{$post->title}</a></h2> *}
 		<h2><a class="articles" n:href="Post:show $post->id">{$post->title}</a></h2>
 
-		<div>{$post->content}</div>
+		<div class="content">{$post->content}</div>
 	</div>
  
 {/block}
