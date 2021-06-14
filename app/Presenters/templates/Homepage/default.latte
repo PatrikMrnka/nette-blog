@@ -1,6 +1,7 @@
 {block content}
 	<div class="center">
 		<a class="animation" n:href="Post:create" n:if="$user->isLoggedIn()">Vytvořit příspěvek</a>
+		<a class="animation" n:href="Settings:user" n:if="$user->isLoggedIn()">Nastavení účtu</a>
 	</div>
 	<h1 n:block="title">Můj blog</h1>
 
