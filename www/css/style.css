@@ -228,6 +228,22 @@ input.button:hover {
     text-align: center;
 }
 
+a.animation.register {
+    font-size: 75%;
+}
+
+.flexbox {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    font-size: 25px;
+}
+
 @media only screen and (max-width: 600px) {
     body {
         font-size: 50%;
