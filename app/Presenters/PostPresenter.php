@@ -28,11 +28,13 @@ class PostPresenter extends Nette\Application\UI\Presenter
 	protected function createComponentCommentForm(): Form
 	{
 		$form = new Form; // means Nette\Application\UI\Form
+		$user = $this->getUser();
 
-		$form->addText('name', 'Jméno:')
+		if (!$user->isLoggedIn()) {
+			$form->addText('name', 'Jméno:')
 			->setRequired();
-
-		$form->addEmail('email', 'E-mail:');
+			$form->addEmail('email', 'E-mail:');
+		}
 
 		$form->addTextArea('content', 'Komentář:')
 			->setRequired();
@@ -47,13 +49,23 @@ class PostPresenter extends Nette\Application\UI\Presenter
 	public function commentFormSucceeded(\stdClass $values): void
 	{
 		$postId = $this->getParameter('postId');
+		$user = $this->getUser();
 
-		$this->database->table('comments')->insert([
-			'post_id' => $postId,
-			'name' => $values->name,
-			'email' => $values->email,
-			'content' => $values->content,
-		]);
+		if ($user->isLoggedIn()) {
+			$this->database->table('comments')->insert([
+				'post_id' => $postId,
+				'name' => $user->getIdentity()->name,
+				'email' => $user->getIdentity()->email,
+				'content' => $values->content,
+			]);
+		} else {
+			$this->database->table('comments')->insert([
+				'post_id' => $postId,
+				'name' => $values->name,
+				'email' => $values->email,
+				'content' => $values->content,
+			]);
+		}
 
 		$this->flashMessage('Děkuji za komentář', 'success');
 		$this->redirect('this');
@@ -74,19 +86,20 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 
-	public function postFormSucceeded(Form $form, array $values): void
+	public function postFormSucceeded(Form $form, $values): void
 	{
 		$postId = $this->getParameter('postId');
+        $user = $this->getUser();
 
-		if (!$this->getUser()->isLoggedIn()) {
-			$this->error('Pro vytvoření, nebo editování příspěvku se musíte přihlásit.');
-		}
-
-		if ($postId) {
-			$post = $this->database->table('posts')->get($postId);
-			$post->update($values);
+        if ($postId) {
+            $post = $this->database->table('posts')->get($postId);
+            $post->update($values);
 		} else {
-			$post = $this->database->table('posts')->insert($values);
+			$post = $this->database->table('posts')->insert([
+				'title' => $values->title,
+				'content' => $values->content,
+				'author' => $user->getIdentity()->name
+			]);
 		}
 
 		$this->flashMessage("Příspěvek byl úspěšně publikován.", 'success');
@@ -108,8 +121,13 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		}	
 		
 		$post = $this->database->table('posts')->get($postId);
+		$user = $this->getUser();
+
 		if (!$post) {
 			$this->error('Příspěvek nebyl nalezen');
+		} else if ($post->author != $user->getIdentity()->name && $user->getIdentity()->name != "admin") {
+			$this->flashMessage("Nemáš oprávnění upravit tento příspěvek");
+			$this->redirect('show', $postId);
 		}
 		$this['postForm']->setDefaults($post->toArray());
 	}
