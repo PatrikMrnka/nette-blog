@@ -244,6 +244,17 @@ a.animation.register {
     font-size: 25px;
 }
 
+.delete-title,
+.post-title {
+    color:#c0392b;
+}
+
+form#frm-deleteForm {
+    display: flex;
+    justify-content: center;
+    margin-top: 45%;
+}
+
 @media only screen and (max-width: 600px) {
     body {
         font-size: 50%;
