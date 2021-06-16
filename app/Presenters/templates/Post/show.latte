@@ -3,10 +3,11 @@
 <div class="center">
 	<p><a class="animation" n:href="Homepage:default">← zpět na výpis příspěvků</a></p>
 	<a class="animation" n:href="edit $post->id" n:if="$user->isLoggedIn()">Upravit příspěvek</a>
+	<a class="animation" n:href="delete $post->id" n:if="$user->isLoggedIn()">Smazat příspěvek</a>
 </div>
 <div class="date">{$post->created_at|date:'F j, Y'}</div>
 
-<h1 n:block="title">{$post->title}</h1>
+<h1 n:block="title" class="post-title">{$post->title}</h1>
 
 <div class="post art">{$post->content}</div>
 
@@ -19,7 +20,7 @@
 	{foreach $comments as $comment}
 		<p><b><a href="mailto:{$comment->email}" n:tag-if="$comment->email">
 			{$comment->name}
-		</a></b> napsal:</p>
+		</a></b> napsal(a):</p>
 
 		<div>{$comment->content}</div>
 	{/foreach}
@@ -30,6 +31,13 @@
 			{else}
 				<li class="right"><a class="animation"n:href="Sign:in">PŘIHLÁSIT</a></li>
 			{/if} *}
+
+<h2>Ohodnoťte příspěvek</h2>
+<div class="rate">
+	<div class="like">{$post->like}</div>
+	<div class="dislike">{$post->dislike}</div>
+	{control rateForm}
+</div>
 
 
 <h2>Vložte nový příspěvek</h2>
