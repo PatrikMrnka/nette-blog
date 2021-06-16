@@ -20,6 +20,7 @@ di:
 services:
 	- App\Router\RouterFactory::createRouter
 	- App\Authenticator
+	security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
 
 security:
 	users:
