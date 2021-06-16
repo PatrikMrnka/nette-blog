@@ -4,14 +4,17 @@ namespace App\Presenters;
 
 use Nette;
 use Nette\Application\UI\Form;
+Use Nette\Security\Passwords;
 
 class RegisterPresenter extends Nette\Application\UI\Presenter 
 {
     private Nette\Database\Explorer $database;
+    private Passwords $passwords;
 
-    public function __construct(Nette\Database\Explorer $database)
+    public function __construct(Nette\Database\Explorer $database, Passwords $passwords)
     {
         $this->database = $database; 
+        $this->passwords = $passwords;
     }
 
     protected function createComponentRegisterForm(): Form
@@ -49,7 +52,7 @@ class RegisterPresenter extends Nette\Application\UI\Presenter
             $users->insert([
                 'username' => $values->username,
                 'email' => $values->email,
-                'password' => $values->password,
+                'password' => $this->passwords->hash($values->password),
                 'role' => "Member",
             ]);
             $this->flashMessage("Úspěšně jste se zaregistrovali.", "success");
