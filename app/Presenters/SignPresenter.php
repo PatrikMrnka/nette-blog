@@ -22,7 +22,7 @@ class SignPresenter extends Nette\Application\UI\Presenter
         return $form;
     }
 
-    public function signInFormSucceeded(Form $form, \stdClass $values): void
+    public function signInFormSucceeded(Form $form, $values): void
     {
         try {
             $this->getUser()->login($values->username, $values->password);
