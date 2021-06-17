@@ -4,12 +4,10 @@ namespace App\Presenters;
 
 use Nette;
 use Nette\Application\UI\Form;
-use Nette\Utils\Arrays;
 
 class PostPresenter extends Nette\Application\UI\Presenter
 {
 	private Nette\Database\Explorer $database;
-	private $arrayLike = [];
     
     public function __construct(Nette\Database\Explorer $database)
 	{
@@ -22,6 +20,17 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		if (!$post) {
 			$this->error('Stránka nebyla nalezena');
 		}
+
+		$user = $this->getUser();
+		$this->template->user = $user;
+
+		// $likes = $this->database->table('likes');
+		// $liked = $likes->where('userId', $user->getIdentity()->id)->where('postId', $postId)->fetch();
+		// $this->template->liked = $liked;
+		$user_likes = $this->database->table('user_likes');
+        $user_liked_post = $user_likes->where('user_id', $user->getIdentity()->id)->where('post_id', $postId)->fetch();
+        $this->template->user_liked_post = $user_liked_post;
+
 		$this->template->post = $post;
 		$this->template->comments = $post->related('comments')->order('created_at');
 	}
@@ -144,70 +153,6 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		$this->redirect('Homepage:');
 	}
 
-	protected function createComponentRateForm(): Form
-	{
-		$form = new Form;
-		$postId = $this->getParameter('postId');
-
-		$form->addSubmit('like', 'LIKE')
-			->onClick[] = [$this, 'rateFormLike'];
-
-		$form->addSubmit('dislike', 'DISLIKE')
-			->onClick[] = [$this, 'rateFormDislike'];
-
-		return $form;
-	}
-
-	public function rateFormLike(Nette\Forms\Controls\Button $button, $values)
-	{
-		$user = $this->getUser();
-		$postId = $this->getParameter('postId');
-		$userId = $user->getIdentity()->id;
-		// Arrays::insertAfter($this->arrayLike, 'a', [$userId => $userId]);
-		// $valueLike = Arrays::get($this->arrayLike, $userId);
-
-		// if ($this->database->table('posts')->get('like') == 0 || $valueLike == $userId ) {
-		// 	$this->database->query('UPDATE posts SET', [
-		// 		'like+=' => 1,
-		// 	], 'WHERE id = ?', $postId);
-		// 	$this->flashMessage("Děkujeme za hlas (like)", 'success');
-		// 	echo $valueLike;
-		// 	echo $userId;
-		// } else if ($valueLike == $userId) {
-		// 	$this->flashMessage("Už si příspěvek ohodnotil.", "wrong");
-		// }
-		// $this->database->query('UPDATE posts SET', [
-		// 	'like+=' => 1,
-		// ], 'WHERE id = ?', $postId);
-		// echo $value;
-		// if ($this->database->table('posts')->get('like') == 0) {
-		// 	Arrays::insertAfter($this->arrayLike, 'a', [$userId => $userId]);
-		// 	$valueLike = Arrays::get($this->arrayLike, $userId);
-		// 	$this->flashMessage("Děkujeme za hlas (like)", 'success');
-		// 	echo $valueLike;
-
-		// } else if ($valueLike == $userId) {
-		// 	$this->flashMessage("Už si příspěvek ohodnotil.", "wrong");
-		// 	$this->redirect('show', $postId);
-		// } 
-	}
-
-	public function rateFormDislike(Nette\Forms\Controls\Button $button, $values)
-	{
-		$postId = $this->getParameter('postId');
-		
-		$this->database->query('UPDATE posts SET', [
-			'dislike+=' => 1,
-		], 'WHERE id = ?', $postId);
-
-		// Arrays::insertAfter($arrayLike, 'a', [$userId => $userId]);
-		// $value = Arrays::get($arrayLike, $userId);
-		// echo $value;
-
-		// $post = $this->database->query('DELETE FROM users WHERE id = ?', $postId);
-		$this->flashMessage("Děkujeme za hlas (dislike)", 'success');
-	}
-
 	public function actionCreate(): void
 	{
 		if (!$this->getUser()->isLoggedIn()) {
@@ -250,6 +195,123 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		$post = $this->database->table('posts')->get($postId);
 		$user = $this->getUser();
 		$userId = $user->getIdentity()->id;
-
 	}
+
+	public function actionLike($postId, bool $like): void
+    {
+        $user = $this->getUser();
+        $posts = $this->database->table('posts');
+        $user_likes = $this->database->table('user_likes');
+
+        if (!$user->isLoggedIn()) {
+            $this->flashMessage("Musíš být přihlášený, aby si mohl ohodnotit příspěvek", 'wrong');
+            $this->redirect('show', $postId);
+        }
+
+        $row = $posts->get($postId);
+
+        $user_liked_post = $user_likes->where('user_id', $user->getIdentity()->id)->where('post_id', $postId)->fetch();
+
+        if (!$user_liked_post) {
+            if ($like)
+            {
+				$this->database->query('INSERT INTO user_likes', [
+					'post_id' => $postId,
+                    'user_id' => $user->getIdentity()->id,
+                    'user_like' => true,
+                    'user_dislike' => false
+				]);
+
+				$this->database->query('UPDATE posts SET', [
+					'likes' => $row->likes+1
+				], 'WHERE id = ?', $postId);
+            }
+            else
+            {
+				$this->database->query('INSERT INTO user_likes', [
+					'post_id' => $postId,
+                    'user_id' => $user->getIdentity()->id,
+                    'user_like' => false,
+                    'user_dislike' => true
+				]);
+
+				$this->database->query('UPDATE posts SET', [
+					'dislikes' => $row->dislikes+1
+				], 'WHERE id = ?', $postId);
+            }
+            $this->redirect('show', $postId);
+        }
+
+        if ($like)
+        {
+            if (!$user_liked_post->user_like)
+            {
+				$this->database->query('UPDATE posts SET', [
+					'likes' => $row->likes+1
+				], 'WHERE id = ?', $postId);
+
+				$this->database->query('UPDATE user_likes SET', [
+					'user_like' => true
+				], 'WHERE user_id = ? AND post_id = ?', $user->getIdentity()->id, $postId);
+
+                if ($user_liked_post->user_dislike)
+                {
+					$this->database->query('UPDATE posts SET', [
+						'dislikes' => $row->dislikes-1
+					], 'WHERE id = ?', $postId);
+
+					$this->database->query('UPDATE user_likes SET', [
+						'user_dislike' => false
+					], 'WHERE user_id = ? AND post_id = ?', $user->getIdentity()->id, $postId);
+                }
+            }
+            else
+            {
+				$this->database->query('UPDATE posts SET', [
+					'likes' => $row->likes-1
+				], 'WHERE id = ?', $postId);
+
+				$this->database->query('UPDATE user_likes SET', [
+					'user_like' => false
+				], 'WHERE user_id = ? AND post_id = ?', $user->getIdentity()->id, $postId);
+            }
+        }
+        else
+        {
+            if (!$user_liked_post->user_dislike)
+            {
+				$this->database->query('UPDATE posts SET', [
+					'dislikes' => $row->dislikes+1
+				], 'WHERE id = ?', $postId);
+
+				$this->database->query('UPDATE user_likes SET', [
+					'user_dislike' => true
+				], 'WHERE user_id = ? AND post_id = ?', $user->getIdentity()->id, $postId);
+
+                // if user already liked the post delete the like
+                if ($user_liked_post->user_like)
+                {
+					$this->database->query('UPDATE posts SET', [
+						'likes' => $row->likes-1
+					], 'WHERE id = ?', $postId);
+
+					$this->database->query('UPDATE user_likes SET', [
+						'user_like' => false
+					], 'WHERE user_id = ? AND post_id = ?', $user->getIdentity()->id, $postId);
+                }
+            }
+            else
+            {
+				$this->database->query('UPDATE posts SET', [
+					'dislikes' => $row->dislikes-1
+				], 'WHERE id = ?', $postId);
+
+				$this->database->query('UPDATE user_likes SET', [
+					'user_dislike' => false
+				], 'WHERE user_id = ? AND post_id = ?', $user->getIdentity()->id, $postId);
+            }
+        }
+
+        $this->redirect('show', $postId);
+    }
 }

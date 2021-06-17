@@ -31,17 +31,33 @@
 			{else}
 				<li class="right"><a class="animation"n:href="Sign:in">PŘIHLÁSIT</a></li>
 			{/if} *}
-
+<div class="margindiv">
 <h2>Ohodnoťte příspěvek</h2>
-<div class="rate">
-	<div class="like">{$post->like}</div>
-	<div class="dislike">{$post->dislike}</div>
-	{control rateForm}
+<hr />
+	<div class="rate">
+        <div class="flex">
+            <a n:href="like (expand) [$post->id, true]"><img class="icon" src="/nette-blog/www/img/like.png"></a>
+            {if $user->isLoggedIn() && $user_liked_post != null && $user_liked_post->user_like}
+                <p class="textrate link">{$post->likes}</p>
+            {else}
+                <p class="textrate">{$post->likes}</p>
+            {/if}
+        </div>
+        <div class="flex">
+            <a n:href="like (expand) [$post->id, false]"><img class="icon" src="/nette-blog/www/img/dislike.png"></a>
+            {if $user->isLoggedIn() && $user_liked_post != null && $user_liked_post->user_dislike}
+                <p class="textrate link">{$post->dislikes}</p>
+            {else}
+                <p class="textrate">{$post->dislikes}</p>
+            {/if}
+        </div>
+    </div>
+	<hr />
 </div>
 
-
+<div class="margindiv">
 <h2>Vložte nový příspěvek</h2>
 
 
 {control commentForm}
-
+</div>
