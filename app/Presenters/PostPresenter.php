@@ -32,7 +32,7 @@ class PostPresenter extends Nette\Application\UI\Presenter
         $this->template->user_liked_post = $user_liked_post;
 
 		$this->template->post = $post;
-		$this->template->comments = $post->related('comments')->order('created_at');
+		$this->template->comments = $this->database->table('comments')->where('post_id', $postId)->order('created_at');
 	}
 
 	public function renderDelete(int $postId): void 
@@ -56,7 +56,7 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		$form->addTextArea('content', 'Komentář:')
 			->setRequired();
 
-		$form->addSubmit('send', 'Publikovat komentář');
+		$form->addSubmit('send', 'Publikovat komentář')->setHtmlAttribute('class', 'ajax');
 
 		$form->onSuccess[] = [$this, 'commentFormSucceeded'];
 
@@ -85,7 +85,7 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		}
 
 		$this->flashMessage('Děkuji za komentář', 'success');
-		$this->redirect('this');
+		$this->redrawControl("comments");
 	}
 
 	protected function createComponentPostForm(): Form
@@ -197,7 +197,7 @@ class PostPresenter extends Nette\Application\UI\Presenter
 		$userId = $user->getIdentity()->id;
 	}
 
-	public function actionLike($postId, bool $like): void
+	public function handleLike($postId, bool $like): void
     {
         $user = $this->getUser();
         $posts = $this->database->table('posts');
@@ -312,6 +312,6 @@ class PostPresenter extends Nette\Application\UI\Presenter
             }
         }
 
-        $this->redirect('show', $postId);
+        $this->redrawControl("rate");
     }
 }

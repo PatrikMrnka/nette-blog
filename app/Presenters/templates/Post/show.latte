@@ -13,7 +13,7 @@
 
 <h2>Komentáře ({count($comments)})</h2>
 
-<div class="comments">
+<div n:snippet="comments" class="comments">
 	{if count($comments) == 0}
 		<p>Nejsou tu žádné komentáře.</p>
 	{/if}
@@ -34,9 +34,9 @@
 <div class="margindiv">
 <h2>Ohodnoťte příspěvek</h2>
 <hr />
-	<div class="rate">
+	<div n:snippet="rate" class="rate">
         <div class="flex">
-            <a n:href="like (expand) [$post->id, true]"><img class="icon" src="/nette-blog/www/img/like.png"></a>
+            <a class="ajax" n:href="like! $post->id, true"><img class="icon" src="/nette-blog/www/img/like.png"></a>
             {if $user->isLoggedIn() && $user_liked_post != null && $user_liked_post->user_like}
                 <p class="textrate link">{$post->likes}</p>
             {else}
@@ -44,7 +44,7 @@
             {/if}
         </div>
         <div class="flex">
-            <a n:href="like (expand) [$post->id, false]"><img class="icon" src="/nette-blog/www/img/dislike.png"></a>
+            <a class="ajax" n:href="like! $post->id, false"><img class="icon" src="/nette-blog/www/img/dislike.png"></a>
             {if $user->isLoggedIn() && $user_liked_post != null && $user_liked_post->user_dislike}
                 <p class="textrate link">{$post->dislikes}</p>
             {else}
