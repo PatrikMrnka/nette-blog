@@ -1,5 +1,4 @@
 Nette Web Project
 =================
 
-Přihlašovací jméno: admin\
-Heslo: secret
+Můj první projekt vytvořený ve frameworku PHP NETTE. ❤️
