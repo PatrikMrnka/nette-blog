@@ -255,6 +255,34 @@ form#frm-deleteForm {
     margin-top: 45%;
 }
 
+.margindiv {
+    margin-bottom: 60px;
+}
+
+.icon {
+    height: 30px;
+    width: 30px;
+    margin-top: 5px;
+}
+
+.rate {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px;
+}
+
+.textrate {
+    margin: 10px;
+    font-size: 20px;
+}
+
 @media only screen and (max-width: 600px) {
     body {
         font-size: 50%;
